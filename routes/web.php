@@ -7,11 +7,12 @@ Route::get('/', function () {
 });
 
 Route::view('dashboard', 'dashboard')
-    ->middleware(['auth', 'verified'])
+    ->middleware(['auth', 'verified', 'org.context'])
     ->name('dashboard');
 
 Route::view('profile', 'profile')
-    ->middleware(['auth'])
+    ->middleware(['auth', 'org.context'])
     ->name('profile');
 
 require __DIR__.'/auth.php';
+require __DIR__.'/organizations.php';
