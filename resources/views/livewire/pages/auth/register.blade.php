@@ -1,8 +1,10 @@
 <?php
 
+use App\Actions\Organization\CreateOrganizationForUser;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Livewire\Attributes\Layout;
@@ -12,23 +14,35 @@ new #[Layout('layouts.guest')] class extends Component
 {
     public string $name = '';
     public string $email = '';
+    public string $organization_name = '';
     public string $password = '';
     public string $password_confirmation = '';
 
     /**
      * Handle an incoming registration request.
      */
-    public function register(): void
+    public function register(CreateOrganizationForUser $createOrganization): void
     {
         $validated = $this->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
+            'organization_name' => ['required', 'string', 'max:255'],
             'password' => ['required', 'string', 'confirmed', Rules\Password::defaults()],
         ]);
 
-        $validated['password'] = Hash::make($validated['password']);
+        $user = DB::transaction(function () use ($validated, $createOrganization) {
+            $user = User::create([
+                'name' => $validated['name'],
+                'email' => $validated['email'],
+                'password' => Hash::make($validated['password']),
+            ]);
 
-        event(new Registered($user = User::create($validated)));
+            $createOrganization($user, $validated['organization_name']);
+
+            return $user;
+        });
+
+        event(new Registered($user));
 
         Auth::login($user);
 
@@ -50,6 +64,13 @@ new #[Layout('layouts.guest')] class extends Component
             <x-input-label for="email" :value="__('Email')" />
             <x-text-input wire:model="email" id="email" class="block mt-1 w-full" type="email" name="email" required autocomplete="username" />
             <x-input-error :messages="$errors->get('email')" class="mt-2" />
+        </div>
+
+        <!-- Organization Name -->
+        <div class="mt-4">
+            <x-input-label for="organization_name" :value="__('Organization Name')" />
+            <x-text-input wire:model="organization_name" id="organization_name" class="block mt-1 w-full" type="text" name="organization_name" required autocomplete="organization" />
+            <x-input-error :messages="$errors->get('organization_name')" class="mt-2" />
         </div>
 
         <!-- Password -->
