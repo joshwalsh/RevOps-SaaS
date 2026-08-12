@@ -1,8 +1,8 @@
-@props(['withText' => true])
+@props(['withText' => true, 'dark' => false])
 
-<span {{ $attributes->class(['group inline-flex items-center gap-2 font-bold tracking-wide text-gray-900']) }}>
+<span {{ $attributes->class(['group inline-flex items-center gap-2 font-bold tracking-wide', $dark ? 'text-white' : 'text-gray-900']) }}>
     <svg
-        class="hi-outline hi-rocket-launch inline-block size-5 flex-none text-blue-600 transition group-hover:scale-110"
+        class="hi-outline hi-rocket-launch inline-block size-5 flex-none {{ $dark ? 'text-blue-400' : 'text-blue-600' }} transition group-hover:scale-110"
         xmlns="http://www.w3.org/2000/svg"
         fill="none"
         viewBox="0 0 24 24"
