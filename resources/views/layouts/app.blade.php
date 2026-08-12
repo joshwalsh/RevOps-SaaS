@@ -15,6 +15,10 @@
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="font-sans text-gray-900 antialiased">
+        @php
+            $isPlatformAdmin = auth()->user()->currentOrganization?->is_super_admin;
+        @endphp
+
         <div
             x-data="{ mobileSidebarOpen: false, desktopSidebarOpen: true }"
             x-bind:class="{ 'lg:pl-64': desktopSidebarOpen }"
@@ -28,19 +32,25 @@
                     'lg:-translate-x-full': !desktopSidebarOpen,
                     'lg:translate-x-0': desktopSidebarOpen,
                 }"
-                class="fixed top-0 bottom-0 left-0 z-50 flex h-full w-full -translate-x-full flex-col border-r border-gray-200 bg-white transition-transform duration-500 ease-out lg:w-64 lg:translate-x-0"
+                class="fixed top-0 bottom-0 left-0 z-50 flex h-full w-full -translate-x-full flex-col border-r transition-transform duration-500 ease-out lg:w-64 lg:translate-x-0 {{ $isPlatformAdmin ? 'border-gray-800 bg-gray-900' : 'border-gray-200 bg-white' }}"
                 aria-label="Main Sidebar Navigation"
             >
-                <div class="flex h-16 w-full flex-none items-center justify-between px-4 lg:justify-center">
-                    <a href="{{ route('dashboard') }}" wire:navigate>
+                <div class="flex h-16 w-full flex-none items-center gap-2 px-4 lg:justify-center">
+                    <a href="{{ route('dashboard') }}" wire:navigate class="{{ $isPlatformAdmin ? 'rounded-lg bg-white px-2 py-1' : '' }}">
                         <x-application-logo class="text-lg" />
                     </a>
 
-                    <div class="lg:hidden">
+                    @if ($isPlatformAdmin)
+                        <span class="rounded-full bg-red-500 px-2 py-0.5 text-xs font-medium text-white">
+                            {{ __('Platform Admin') }}
+                        </span>
+                    @endif
+
+                    <div class="ms-auto lg:hidden">
                         <button
                             x-on:click="mobileSidebarOpen = false"
                             type="button"
-                            class="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm leading-5 font-semibold text-gray-800 hover:border-gray-300 hover:text-gray-900 hover:shadow-xs focus:ring-3 focus:ring-gray-300/25 active:border-gray-200 active:shadow-none"
+                            class="inline-flex items-center justify-center gap-2 rounded-lg border px-3 py-2 text-sm leading-5 font-semibold focus:ring-3 active:shadow-none {{ $isPlatformAdmin ? 'border-gray-700 bg-gray-800 text-gray-100 hover:border-gray-600 hover:text-white focus:ring-gray-500/25 active:border-gray-700' : 'border-gray-200 bg-white text-gray-800 hover:border-gray-300 hover:text-gray-900 hover:shadow-xs focus:ring-gray-300/25 active:border-gray-200' }}"
                         >
                             <svg class="inline-block size-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                                 <path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z" />
@@ -51,7 +61,7 @@
 
                 <div class="overflow-y-auto">
                     <div class="w-full p-4">
-                        <nav class="space-y-1">
+                        <nav class="space-y-1 {{ $isPlatformAdmin ? 'rounded-lg bg-white p-2 shadow-xs' : '' }}">
                             <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" wire:navigate>
                                 <span class="flex flex-none items-center text-blue-500">
                                     <svg class="inline-block size-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
@@ -61,16 +71,25 @@
                                 <span class="grow">{{ __('Dashboard') }}</span>
                             </x-nav-link>
 
-                            <x-nav-link :href="route('profile')" :active="request()->routeIs('profile')" wire:navigate>
-                                <span class="flex flex-none items-center text-gray-400">
-                                    <svg class="inline-block size-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z" />
-                                    </svg>
-                                </span>
-                                <span class="grow">{{ __('Profile') }}</span>
-                            </x-nav-link>
+                            @if ($isPlatformAdmin)
+                                <x-nav-link :href="route('admin.organizations')" :active="request()->routeIs('admin.organizations')" wire:navigate>
+                                    <span class="flex flex-none items-center text-gray-400">
+                                        <svg class="inline-block size-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21" />
+                                        </svg>
+                                    </span>
+                                    <span class="grow">{{ __('Organizations') }}</span>
+                                </x-nav-link>
 
-                            @if (auth()->user()->currentOrganization)
+                                <x-nav-link :href="route('admin.members')" :active="request()->routeIs('admin.members')" wire:navigate>
+                                    <span class="flex flex-none items-center text-gray-400">
+                                        <svg class="inline-block size-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z" />
+                                        </svg>
+                                    </span>
+                                    <span class="grow">{{ __('Members') }}</span>
+                                </x-nav-link>
+                            @elseif (auth()->user()->currentOrganization)
                                 <x-nav-link :href="route('organizations.members', auth()->user()->currentOrganization)" :active="request()->routeIs('organizations.members')" wire:navigate>
                                     <span class="flex flex-none items-center text-gray-400">
                                         <svg class="inline-block size-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
@@ -80,6 +99,15 @@
                                     <span class="grow">{{ __('Members') }}</span>
                                 </x-nav-link>
                             @endif
+
+                            <x-nav-link :href="route('profile')" :active="request()->routeIs('profile')" wire:navigate>
+                                <span class="flex flex-none items-center text-gray-400">
+                                    <svg class="inline-block size-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    </svg>
+                                </span>
+                                <span class="grow">{{ __('Profile') }}</span>
+                            </x-nav-link>
                         </nav>
                     </div>
                 </div>

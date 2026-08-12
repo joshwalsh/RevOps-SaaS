@@ -24,7 +24,10 @@ new class extends Component
     public function with(): array
     {
         return [
-            'organizations' => auth()->user()->organizations,
+            'organizations' => auth()->user()->organizations()
+                ->orderByDesc('is_super_admin')
+                ->orderBy('name')
+                ->get(),
         ];
     }
 }; ?>

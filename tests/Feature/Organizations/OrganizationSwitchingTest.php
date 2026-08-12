@@ -30,3 +30,15 @@ it('forbids switching to an organization the user does not belong to', function 
 
     expect($user->fresh()->current_organization_id)->toBe($originalOrganizationId);
 });
+
+it('lists the super-admin organization first in the switcher, ahead of alphabetically earlier organizations', function () {
+    $user = User::factory()->create();
+    $superAdminOrg = Organization::factory()->superAdmin()->create(['name' => 'Zzz Platform Administration']);
+    $superAdminOrg->users()->attach($user, ['role' => OrganizationRole::Member]);
+
+    $organizations = Volt::actingAs($user)
+        ->test('layout.organization-switcher')
+        ->viewData('organizations');
+
+    expect($organizations->first()->is($superAdminOrg))->toBeTrue();
+});
