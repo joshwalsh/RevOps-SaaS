@@ -24,6 +24,7 @@ class TransactionFactory extends Factory
             'organization_id' => Organization::factory(),
             'person_id' => Person::factory(),
             'product_id' => Product::factory(),
+            'product_name' => fake()->unique()->words(3, true),
             'amount_cents' => fake()->randomElement([0, 900, 2900, 9900]),
             'currency' => 'USD',
         ];
@@ -36,6 +37,17 @@ class TransactionFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'amount_cents' => 0,
+        ]);
+    }
+
+    /**
+     * Indicate that the signup couldn't be matched to a catalog Product,
+     * keeping only the recorded product_name.
+     */
+    public function withoutMatchedProduct(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'product_id' => null,
         ]);
     }
 }
