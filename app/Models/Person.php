@@ -42,4 +42,12 @@ class Person extends Model
     {
         return $this->hasMany(Event::class);
     }
+
+    /**
+     * The product signup transactions attributed to this person.
+     */
+    public function transactions(): HasMany
+    {
+        return $this->hasMany(Transaction::class);
+    }
 }
