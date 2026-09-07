@@ -21,7 +21,7 @@ class OrganizationPolicy
      */
     public function update(User $user, Organization $organization): bool
     {
-        return $this->hasManagerRole($user, $organization);
+        return $user->isManagerOf($organization);
     }
 
     /**
@@ -34,7 +34,7 @@ class OrganizationPolicy
             return $user->hasRole($organization, OrganizationRole::Owner);
         }
 
-        return $this->hasManagerRole($user, $organization);
+        return $user->isManagerOf($organization);
     }
 
     /**
@@ -68,7 +68,7 @@ class OrganizationPolicy
             return $user->hasRole($organization, OrganizationRole::Owner);
         }
 
-        return $this->hasManagerRole($user, $organization);
+        return $user->isManagerOf($organization);
     }
 
     /**
@@ -82,12 +82,6 @@ class OrganizationPolicy
         }
 
         return $user->hasRole($organization, OrganizationRole::Owner);
-    }
-
-    protected function hasManagerRole(User $user, Organization $organization): bool
-    {
-        return $user->hasRole($organization, OrganizationRole::Owner)
-            || $user->hasRole($organization, OrganizationRole::Admin);
     }
 
     protected function isLastOwner(Organization $organization): bool

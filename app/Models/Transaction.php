@@ -47,4 +47,24 @@ class Transaction extends Model
     {
         return $this->amount_cents === 0;
     }
+
+    /**
+     * A human-readable amount, e.g. "Free" or "$29.00 USD".
+     */
+    public function amountLabel(): string
+    {
+        return $this->isFree()
+            ? __('Free')
+            : '$'.number_format($this->amount_cents / 100, 2).' '.$this->currency;
+    }
+
+    /**
+     * This organization's captured contact info for the transaction's
+     * person. Only meaningful when person.tenantPeople has been eager
+     * loaded scoped to this transaction's organization_id.
+     */
+    public function tenantContact(): ?TenantPeople
+    {
+        return $this->person?->tenantPeople->first();
+    }
 }

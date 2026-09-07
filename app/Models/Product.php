@@ -33,4 +33,14 @@ class Product extends Model
     {
         return $this->price_cents === 0;
     }
+
+    /**
+     * A human-readable price, e.g. "Free" or "$29.00 USD".
+     */
+    public function priceLabel(): string
+    {
+        return $this->isFree()
+            ? __('Free')
+            : '$'.number_format($this->price_cents / 100, 2).' '.$this->currency;
+    }
 }

@@ -16,6 +16,9 @@ return new class extends Migration
             $table->foreignId('organization_id')->constrained()->cascadeOnDelete();
             $table->foreignUlid('person_id')->constrained('people')->cascadeOnDelete();
             $table->timestamp('first_seen_at');
+            $table->string('first_name')->nullable();
+            $table->string('last_name')->nullable();
+            $table->string('email')->nullable();
             $table->timestamps();
 
             $table->unique(['organization_id', 'person_id']);

@@ -75,6 +75,30 @@ class Organization extends Model
     }
 
     /**
+     * This tenant's links to the canonical people it has identified.
+     */
+    public function tenantPeople(): HasMany
+    {
+        return $this->hasMany(TenantPeople::class);
+    }
+
+    /**
+     * The tenant's catalog of products.
+     */
+    public function products(): HasMany
+    {
+        return $this->hasMany(Product::class);
+    }
+
+    /**
+     * The tenant's recorded signup transactions.
+     */
+    public function transactions(): HasMany
+    {
+        return $this->hasMany(Transaction::class);
+    }
+
+    /**
      * Determine the role a user holds within this organization, if any.
      */
     public function roleFor(User $user): ?OrganizationRole

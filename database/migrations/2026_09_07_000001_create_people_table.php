@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('people', function (Blueprint $table) {
             $table->ulid('id')->primary();
-            $table->string('email_hash', 64)->unique();
+            $table->string('email_hash', 64)->nullable()->unique();
             $table->timestamps();
         });
     }

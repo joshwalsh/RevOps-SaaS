@@ -42,4 +42,36 @@ class IdentityResolver
             return $person;
         });
     }
+
+    /**
+     * Find or create a person for a manually-entered contact (e.g. an
+     * offline signup recorded by a tenant), rather than one resolved from
+     * tracked anonymous activity. Deduplicates by email when one is given;
+     * without an email there's nothing to match against, so a new person is
+     * always created. Existing contact fields are left alone when the new
+     * value given is blank, so a partial edit doesn't clobber known info.
+     */
+    public function resolveContact(string $organizationId, ?string $email, ?string $firstName, ?string $lastName): Person
+    {
+        $emailHash = $email !== null ? hash('sha256', mb_strtolower(trim($email))) : null;
+
+        return DB::transaction(function () use ($organizationId, $emailHash, $email, $firstName, $lastName) {
+            $person = $emailHash !== null
+                ? Person::query()->firstOrCreate(['email_hash' => $emailHash])
+                : Person::query()->create();
+
+            $tenantPerson = TenantPeople::query()->firstOrCreate(
+                ['organization_id' => $organizationId, 'person_id' => $person->id],
+                ['first_seen_at' => now()],
+            );
+
+            $tenantPerson->fill(array_filter([
+                'first_name' => $firstName,
+                'last_name' => $lastName,
+                'email' => $email,
+            ], fn ($value) => filled($value)))->save();
+
+            return $person;
+        });
+    }
 }
