@@ -81,6 +81,15 @@ class User extends Authenticatable
     }
 
     /**
+     * Determine if the user can manage the organization's data (Owner or Admin).
+     */
+    public function isManagerOf(Organization $organization): bool
+    {
+        return $this->hasRole($organization, OrganizationRole::Owner)
+            || $this->hasRole($organization, OrganizationRole::Admin);
+    }
+
+    /**
      * Switch the user's currently active organization.
      */
     public function switchOrganization(Organization $organization): void
