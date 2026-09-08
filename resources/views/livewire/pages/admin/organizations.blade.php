@@ -44,7 +44,9 @@ new #[Layout('layouts.app')] class extends Component
             <div class="flex items-center justify-between py-4">
                 <div>
                     <div class="flex items-center gap-2 text-sm font-medium text-gray-900">
-                        {{ $organization->name }}
+                        <a href="{{ route('organizations.people.index', $organization) }}" wire:navigate class="hover:text-blue-700 hover:underline">
+                            {{ $organization->name }}
+                        </a>
 
                         @if ($organization->is_super_admin)
                             <span class="rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700">
