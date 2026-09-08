@@ -25,3 +25,16 @@ it('forbids a regular user from viewing the organizations index', function () {
         ->get(route('admin.organizations'))
         ->assertForbidden();
 });
+
+it('lets a super admin navigate into an organization they are not a member of', function () {
+    $superAdminOrg = Organization::factory()->superAdmin()->create();
+    $user = User::factory()->create();
+    $superAdminOrg->users()->attach($user, ['role' => OrganizationRole::User]);
+
+    $otherOrg = Organization::factory()->create(['name' => 'Acme Inc']);
+
+    $this->actingAs($user)
+        ->get(route('admin.organizations'))
+        ->assertOk()
+        ->assertSee(route('organizations.people.index', $otherOrg), false);
+});

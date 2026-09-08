@@ -39,3 +39,18 @@ it('shows the normal nav for a regular member', function () {
         ->assertDontSee('bg-gray-900', false)
         ->assertDontSee(route('admin.organizations'));
 });
+
+it('shows organization-scoped navigation when a super admin visits an organization they are not a member of', function () {
+    $superAdminOrg = Organization::factory()->superAdmin()->create();
+    $user = User::factory()->create();
+    $superAdminOrg->users()->attach($user, ['role' => OrganizationRole::User]);
+
+    $otherOrg = Organization::factory()->create();
+
+    $this->actingAs($user)
+        ->get(route('organizations.people.index', $otherOrg))
+        ->assertOk()
+        ->assertSee(route('organizations.products', $otherOrg))
+        ->assertSee(route('organizations.transactions', $otherOrg))
+        ->assertSee(route('organizations.events', $otherOrg));
+});
