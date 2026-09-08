@@ -99,6 +99,30 @@ class Organization extends Model
     }
 
     /**
+     * The tenant's recorded behavioral events.
+     */
+    public function events(): HasMany
+    {
+        return $this->hasMany(Event::class);
+    }
+
+    /**
+     * The tenant's user-defined canonical events.
+     */
+    public function canonicalEvents(): HasMany
+    {
+        return $this->hasMany(CanonicalEvent::class);
+    }
+
+    /**
+     * The tenant's raw event_name -> canonical event mappings.
+     */
+    public function eventNameMappings(): HasMany
+    {
+        return $this->hasMany(EventNameMapping::class);
+    }
+
+    /**
      * Determine the role a user holds within this organization, if any.
      */
     public function roleFor(User $user): ?OrganizationRole
