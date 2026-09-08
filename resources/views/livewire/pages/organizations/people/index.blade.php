@@ -46,14 +46,26 @@ new #[Layout('layouts.app')] class extends Component
 }; ?>
 
 <div>
-    <div class="max-w-2xl">
-        <h2 class="text-lg font-medium text-gray-900">
-            {{ __('People') }}
-        </h2>
+    <div class="max-w-2xl flex items-start justify-between gap-4">
+        <div>
+            <h2 class="text-lg font-medium text-gray-900">
+                {{ __('People') }}
+            </h2>
 
-        <p class="mt-1 text-sm text-gray-600">
-            {{ __('Everyone tracked or identified at :organization.', ['organization' => $organization->name]) }}
-        </p>
+            <p class="mt-1 text-sm text-gray-600">
+                {{ __('Everyone tracked or identified at :organization.', ['organization' => $organization->name]) }}
+            </p>
+        </div>
+
+        @can('create', [\App\Models\TenantPeople::class, $organization])
+            <a
+                href="{{ route('organizations.people.import', $organization) }}"
+                wire:navigate
+                class="shrink-0 text-sm font-medium text-blue-700 hover:text-blue-800"
+            >
+                {{ __('Import CSV') }}
+            </a>
+        @endcan
     </div>
 
     <div class="mt-6 max-w-2xl">

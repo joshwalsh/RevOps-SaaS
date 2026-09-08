@@ -27,6 +27,10 @@ Route::middleware('auth')->group(function () {
         ->middleware(['verified', 'org.context'])
         ->name('organizations.people.index');
 
+    Volt::route('organizations/{organization}/people/import', 'pages.organizations.people.import')
+        ->middleware(['verified', 'org.context'])
+        ->name('organizations.people.import');
+
     Volt::route('organizations/{organization}/people/{tenantPersonId}', 'pages.organizations.people.show')
         ->middleware(['verified', 'org.context'])
         ->name('organizations.people.show');

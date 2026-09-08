@@ -25,6 +25,14 @@ class TenantPeoplePolicy
     }
 
     /**
+     * Determine whether the user can import people into the organization.
+     */
+    public function create(User $user, Organization $organization): bool
+    {
+        return $user->isManagerOf($organization);
+    }
+
+    /**
      * Determine whether the user can edit the captured contact info.
      */
     public function update(User $user, TenantPeople $tenantPerson): bool

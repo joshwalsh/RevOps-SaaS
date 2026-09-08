@@ -5,5 +5,6 @@ Before planning or editing, find the row whose globs match the file's path and r
 | Applies to | Rule file |
 | --- | --- |
 | resources/views/layouts/app.blade.php,resources/views/livewire/pages/admin/** | .ai/rules/admin.md |
+| resources/views/livewire/** | .ai/rules/livewire.md |
 | tests/** | .ai/rules/tests.md |
 | resources/views/** | .ai/rules/views.md |
