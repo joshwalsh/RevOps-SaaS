@@ -12,7 +12,7 @@ use Livewire\Volt\Volt;
 it('lets any member view the raw event names with occurrence counts', function () {
     $organization = Organization::factory()->create();
     $member = User::factory()->create();
-    $organization->users()->attach($member, ['role' => OrganizationRole::Member]);
+    $organization->users()->attach($member, ['role' => OrganizationRole::User]);
     $identity = AnonIdentity::factory()->create(['organization_id' => $organization->id]);
     Event::factory()->count(3)->create([
         'organization_id' => $organization->id,
@@ -44,7 +44,7 @@ it('does not let a non-member load the events index', function () {
 it('only shows event names recorded for this tenant', function () {
     $organization = Organization::factory()->create();
     $member = User::factory()->create();
-    $organization->users()->attach($member, ['role' => OrganizationRole::Member]);
+    $organization->users()->attach($member, ['role' => OrganizationRole::User]);
     $identity = AnonIdentity::factory()->create(['organization_id' => $organization->id]);
     Event::factory()->create([
         'organization_id' => $organization->id,
@@ -164,7 +164,7 @@ it('lets an owner unmap an event name', function () {
 it('does not let a plain member map an event name', function () {
     $organization = Organization::factory()->create();
     $member = User::factory()->create();
-    $organization->users()->attach($member, ['role' => OrganizationRole::Member]);
+    $organization->users()->attach($member, ['role' => OrganizationRole::User]);
 
     Volt::actingAs($member)
         ->test('pages.organizations.events', ['organization' => $organization])
@@ -179,7 +179,7 @@ it('does not let a plain member map an event name', function () {
 it('does not let a plain member unmap an event name', function () {
     $organization = Organization::factory()->create();
     $member = User::factory()->create();
-    $organization->users()->attach($member, ['role' => OrganizationRole::Member]);
+    $organization->users()->attach($member, ['role' => OrganizationRole::User]);
     $canonicalEvent = CanonicalEvent::factory()->create(['organization_id' => $organization->id]);
     EventNameMapping::factory()->create([
         'organization_id' => $organization->id,
@@ -198,7 +198,7 @@ it('does not let a plain member unmap an event name', function () {
 it('shows canonical events grouped with the raw names that roll up into them', function () {
     $organization = Organization::factory()->create();
     $member = User::factory()->create();
-    $organization->users()->attach($member, ['role' => OrganizationRole::Member]);
+    $organization->users()->attach($member, ['role' => OrganizationRole::User]);
     $identity = AnonIdentity::factory()->create(['organization_id' => $organization->id]);
     Event::factory()->create(['organization_id' => $organization->id, 'anon_identity_id' => $identity->id, 'event_name' => 'page_view']);
     Event::factory()->create(['organization_id' => $organization->id, 'anon_identity_id' => $identity->id, 'event_name' => 'page_render']);
