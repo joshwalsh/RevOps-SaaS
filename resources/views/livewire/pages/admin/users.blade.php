@@ -31,7 +31,7 @@ new #[Layout('layouts.app')] class extends Component
 <div>
     <div class="max-w-2xl">
         <h2 class="text-lg font-medium text-gray-900">
-            {{ __('Members') }}
+            {{ __('Users') }}
         </h2>
 
         <p class="mt-1 text-sm text-gray-600">
@@ -52,17 +52,17 @@ new #[Layout('layouts.app')] class extends Component
             </h3>
 
             <div class="mt-6 divide-y divide-gray-200 border-t border-gray-200">
-                @foreach ($organization->users as $member)
+                @foreach ($organization->users as $user)
                     <div class="flex items-center justify-between py-4">
                         <div>
-                            <div class="text-sm font-medium text-gray-900">{{ $member->name }}</div>
-                            <div class="text-sm text-gray-500">{{ $member->email }}</div>
+                            <div class="text-sm font-medium text-gray-900">{{ $user->name }}</div>
+                            <div class="text-sm text-gray-500">{{ $user->email }}</div>
                         </div>
 
                         <div class="flex items-center gap-4">
-                            <span class="text-sm text-gray-500">{{ ucfirst($member->pivot->role->value) }}</span>
+                            <span class="text-sm text-gray-500">{{ ucfirst($user->pivot->role->value) }}</span>
 
-                            <a href="{{ route('organizations.members', $organization) }}" wire:navigate class="text-sm font-medium text-blue-700 hover:text-blue-800">
+                            <a href="{{ route('organizations.users', $organization) }}" wire:navigate class="text-sm font-medium text-blue-700 hover:text-blue-800">
                                 {{ __('Manage') }}
                             </a>
                         </div>

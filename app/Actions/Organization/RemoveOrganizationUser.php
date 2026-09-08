@@ -7,15 +7,15 @@ use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 
-class RemoveOrganizationMember
+class RemoveOrganizationUser
 {
     /**
-     * Remove the target member from the organization, used both when an
-     * owner/admin removes someone and when a member voluntarily leaves.
+     * Remove the target user from the organization, used both when an
+     * owner/admin removes someone and when a user voluntarily leaves.
      */
     public function __invoke(User $actor, Organization $organization, User $target): void
     {
-        Gate::forUser($actor)->authorize('removeMember', [$organization, $target]);
+        Gate::forUser($actor)->authorize('removeUser', [$organization, $target]);
 
         DB::transaction(function () use ($organization, $target) {
             $organization->users()->detach($target);

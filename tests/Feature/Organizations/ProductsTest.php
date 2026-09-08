@@ -10,7 +10,7 @@ use Livewire\Volt\Volt;
 it('lets any member view the product catalog', function () {
     $organization = Organization::factory()->create();
     $member = User::factory()->create();
-    $organization->users()->attach($member, ['role' => OrganizationRole::Member]);
+    $organization->users()->attach($member, ['role' => OrganizationRole::User]);
     Product::factory()->create(['organization_id' => $organization->id, 'name' => 'Pro Plan']);
 
     Volt::actingAs($member)
@@ -51,7 +51,7 @@ it('lets an owner create a product', function () {
 it('does not let a plain member create a product', function () {
     $organization = Organization::factory()->create();
     $member = User::factory()->create();
-    $organization->users()->attach($member, ['role' => OrganizationRole::Member]);
+    $organization->users()->attach($member, ['role' => OrganizationRole::User]);
 
     Volt::actingAs($member)
         ->test('pages.organizations.products', ['organization' => $organization])
@@ -108,7 +108,7 @@ it('lets an owner delete a product, keeping existing transactions with their rec
 it('does not let a plain member delete a product', function () {
     $organization = Organization::factory()->create();
     $member = User::factory()->create();
-    $organization->users()->attach($member, ['role' => OrganizationRole::Member]);
+    $organization->users()->attach($member, ['role' => OrganizationRole::User]);
     $product = Product::factory()->create(['organization_id' => $organization->id]);
 
     Volt::actingAs($member)

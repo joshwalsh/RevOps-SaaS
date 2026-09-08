@@ -7,7 +7,7 @@ use App\Models\User;
 it('shows the platform admin nav with dark sidebar styling when the user has switched to the super-admin organization', function () {
     $superAdminOrg = Organization::factory()->superAdmin()->create();
     $user = User::factory()->create();
-    $superAdminOrg->users()->attach($user, ['role' => OrganizationRole::Member]);
+    $superAdminOrg->users()->attach($user, ['role' => OrganizationRole::User]);
     $user->switchOrganization($superAdminOrg);
 
     $this->actingAs($user)
@@ -15,13 +15,13 @@ it('shows the platform admin nav with dark sidebar styling when the user has swi
         ->assertOk()
         ->assertSee('bg-gray-900', false)
         ->assertSee(route('admin.organizations'))
-        ->assertSee(route('admin.members'));
+        ->assertSee(route('admin.users'));
 });
 
 it('shows the normal nav for a super admin currently viewing a regular organization', function () {
     $superAdminOrg = Organization::factory()->superAdmin()->create();
     $user = User::factory()->create();
-    $superAdminOrg->users()->attach($user, ['role' => OrganizationRole::Member]);
+    $superAdminOrg->users()->attach($user, ['role' => OrganizationRole::User]);
 
     $this->actingAs($user)
         ->get(route('dashboard'))

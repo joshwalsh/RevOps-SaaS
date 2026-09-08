@@ -53,12 +53,12 @@ new #[Layout('layouts.app')] class extends Component
                         @endif
                     </div>
                     <div class="text-sm text-gray-500">
-                        {{ $organization->users_count }} {{ $organization->users_count === 1 ? __('member') : __('members') }}
+                        {{ $organization->users_count }} {{ $organization->users_count === 1 ? __('user') : __('users') }}
                     </div>
                 </div>
 
-                <a href="{{ route('organizations.members', $organization) }}" wire:navigate class="text-sm font-medium text-blue-700 hover:text-blue-800">
-                    {{ __('Manage Members') }}
+                <a href="{{ route('organizations.users', $organization) }}" wire:navigate class="text-sm font-medium text-blue-700 hover:text-blue-800">
+                    {{ __('Manage Users') }}
                 </a>
             </div>
         @endforeach

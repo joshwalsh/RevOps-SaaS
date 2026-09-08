@@ -18,7 +18,7 @@ it('does not redirect a super admin with no current organization', function () {
     $superAdminOrg = Organization::factory()->superAdmin()->create();
     $user = User::factory()->create();
     $user->organizations()->detach();
-    $superAdminOrg->users()->attach($user, ['role' => OrganizationRole::Member]);
+    $superAdminOrg->users()->attach($user, ['role' => OrganizationRole::User]);
     $user->forceFill(['current_organization_id' => null])->save();
 
     $this->actingAs($user)

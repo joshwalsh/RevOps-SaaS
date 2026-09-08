@@ -25,10 +25,10 @@ class OrganizationPolicy
     }
 
     /**
-     * Determine whether the user can add a member with the given role.
+     * Determine whether the user can add a user with the given role.
      * Only an Owner may grant the Owner role, preventing Admin self-escalation.
      */
-    public function addMember(User $user, Organization $organization, OrganizationRole $role = OrganizationRole::Member): bool
+    public function addUser(User $user, Organization $organization, OrganizationRole $role = OrganizationRole::User): bool
     {
         if ($role === OrganizationRole::Owner) {
             return $user->hasRole($organization, OrganizationRole::Owner);
@@ -38,17 +38,17 @@ class OrganizationPolicy
     }
 
     /**
-     * Determine whether the user can change an existing member's role.
+     * Determine whether the user can change an existing user's role.
      */
-    public function updateMemberRole(User $user, Organization $organization): bool
+    public function updateUserRole(User $user, Organization $organization): bool
     {
         return $user->hasRole($organization, OrganizationRole::Owner);
     }
 
     /**
-     * Determine whether the user can remove the target member from the organization.
+     * Determine whether the user can remove the target user from the organization.
      */
-    public function removeMember(User $user, Organization $organization, User $target): bool
+    public function removeUser(User $user, Organization $organization, User $target): bool
     {
         $targetRole = $organization->roleFor($target);
 

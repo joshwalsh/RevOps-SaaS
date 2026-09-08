@@ -1,6 +1,6 @@
 <?php
 
-use App\Actions\Organization\RemoveOrganizationMember;
+use App\Actions\Organization\RemoveOrganizationUser;
 use App\Enums\OrganizationRole;
 use App\Mail\OrganizationInvitationMail;
 use App\Models\Organization;
@@ -17,7 +17,7 @@ new #[Layout('layouts.app')] class extends Component
 
     public string $inviteEmail = '';
 
-    public string $inviteRole = 'member';
+    public string $inviteRole = 'user';
 
     /**
      * Resolve the organization and confirm the current user may view it.
@@ -30,13 +30,13 @@ new #[Layout('layouts.app')] class extends Component
     }
 
     /**
-     * Invite a new member to the organization by email.
+     * Invite a new user to the organization by email.
      */
     public function invite(): void
     {
         $role = OrganizationRole::from($this->inviteRole);
 
-        Gate::authorize('addMember', [$this->organization, $role]);
+        Gate::authorize('addUser', [$this->organization, $role]);
 
         $validated = $this->validate([
             'inviteEmail' => [
@@ -61,11 +61,11 @@ new #[Layout('layouts.app')] class extends Component
     }
 
     /**
-     * Remove a member from the organization, or leave it voluntarily.
+     * Remove a user from the organization, or leave it voluntarily.
      */
-    public function removeMember(int $userId, RemoveOrganizationMember $removeMember): void
+    public function removeUser(int $userId, RemoveOrganizationUser $removeUser): void
     {
-        $removeMember(auth()->user(), $this->organization, User::findOrFail($userId));
+        $removeUser(auth()->user(), $this->organization, User::findOrFail($userId));
     }
 
     /**
@@ -74,7 +74,7 @@ new #[Layout('layouts.app')] class extends Component
     public function with(): array
     {
         return [
-            'members' => $this->organization->users()->get(),
+            'users' => $this->organization->users()->get(),
             'pendingInvitations' => $this->organization->invitations()->latest()->get(),
             'roles' => OrganizationRole::cases(),
         ];
@@ -84,7 +84,7 @@ new #[Layout('layouts.app')] class extends Component
 <div>
     <div class="max-w-2xl">
         <h2 class="text-lg font-medium text-gray-900">
-            {{ __('Members') }}
+            {{ __('Users') }}
         </h2>
 
         <p class="mt-1 text-sm text-gray-600">
@@ -92,22 +92,22 @@ new #[Layout('layouts.app')] class extends Component
         </p>
 
         <div class="mt-6 divide-y divide-gray-200 border-t border-gray-200">
-            @foreach ($members as $member)
+            @foreach ($users as $user)
                 <div class="flex items-center justify-between py-4">
                     <div>
-                        <div class="text-sm font-medium text-gray-900">{{ $member->name }}</div>
-                        <div class="text-sm text-gray-500">{{ $member->email }}</div>
+                        <div class="text-sm font-medium text-gray-900">{{ $user->name }}</div>
+                        <div class="text-sm text-gray-500">{{ $user->email }}</div>
                     </div>
 
                     <div class="flex items-center gap-4">
-                        <span class="text-sm text-gray-500">{{ ucfirst($member->pivot->role->value) }}</span>
+                        <span class="text-sm text-gray-500">{{ ucfirst($user->pivot->role->value) }}</span>
 
-                        @can('removeMember', [$organization, $member])
+                        @can('removeUser', [$organization, $user])
                             <x-danger-button
-                                wire:click="removeMember({{ $member->id }})"
+                                wire:click="removeUser({{ $user->id }})"
                                 wire:confirm="{{ __('Are you sure?') }}"
                             >
-                                {{ $member->is(auth()->user()) ? __('Leave') : __('Remove') }}
+                                {{ $user->is(auth()->user()) ? __('Leave') : __('Remove') }}
                             </x-danger-button>
                         @endcan
                     </div>
@@ -135,7 +135,7 @@ new #[Layout('layouts.app')] class extends Component
 
     <div class="max-w-2xl mt-10">
         <h3 class="text-lg font-medium text-gray-900">
-            {{ __('Invite Member') }}
+            {{ __('Invite User') }}
         </h3>
 
         <form wire:submit="invite" class="mt-6 flex items-end gap-4">

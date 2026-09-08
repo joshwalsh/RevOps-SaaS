@@ -8,7 +8,7 @@ use Livewire\Volt\Volt;
 it('lets a user switch to an organization they belong to', function () {
     $user = User::factory()->create();
     $otherOrganization = Organization::factory()->create();
-    $otherOrganization->users()->attach($user, ['role' => OrganizationRole::Member]);
+    $otherOrganization->users()->attach($user, ['role' => OrganizationRole::User]);
 
     Volt::actingAs($user)
         ->test('layout.organization-switcher')
@@ -34,7 +34,7 @@ it('forbids switching to an organization the user does not belong to', function 
 it('lists the super-admin organization first in the switcher, ahead of alphabetically earlier organizations', function () {
     $user = User::factory()->create();
     $superAdminOrg = Organization::factory()->superAdmin()->create(['name' => 'Zzz Platform Administration']);
-    $superAdminOrg->users()->attach($user, ['role' => OrganizationRole::Member]);
+    $superAdminOrg->users()->attach($user, ['role' => OrganizationRole::User]);
 
     $organizations = Volt::actingAs($user)
         ->test('layout.organization-switcher')

@@ -34,6 +34,12 @@ new class extends Component
 
     <x-slot name="content">
         <div class="space-y-1 p-2.5">
+            @if (auth()->user()->currentOrganization && ! auth()->user()->currentOrganization->is_super_admin)
+                <x-dropdown-link :href="route('organizations.users', auth()->user()->currentOrganization)" wire:navigate>
+                    {{ __('Users') }}
+                </x-dropdown-link>
+            @endif
+
             <x-dropdown-link :href="route('profile')" wire:navigate>
                 {{ __('Profile') }}
             </x-dropdown-link>
