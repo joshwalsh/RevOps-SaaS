@@ -19,6 +19,10 @@ Route::middleware('auth')->group(function () {
         ->middleware(['verified', 'org.context'])
         ->name('organizations.transactions');
 
+    Volt::route('organizations/{organization}/events', 'pages.organizations.events')
+        ->middleware(['verified', 'org.context'])
+        ->name('organizations.events');
+
     Volt::route('organizations/{organization}/people', 'pages.organizations.people.index')
         ->middleware(['verified', 'org.context'])
         ->name('organizations.people.index');
