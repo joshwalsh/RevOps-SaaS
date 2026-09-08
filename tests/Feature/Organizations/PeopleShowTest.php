@@ -11,7 +11,7 @@ use Livewire\Volt\Volt;
 it('lets any member view a person detail page with contact info and activity', function () {
     $organization = Organization::factory()->create();
     $member = User::factory()->create();
-    $organization->users()->attach($member, ['role' => OrganizationRole::Member]);
+    $organization->users()->attach($member, ['role' => OrganizationRole::User]);
     $tenantPerson = TenantPeople::factory()->create([
         'organization_id' => $organization->id,
         'first_name' => 'Ada',
@@ -32,7 +32,7 @@ it('lets any member view a person detail page with contact info and activity', f
 it('404s when the tenant person id belongs to a different tenant', function () {
     $organization = Organization::factory()->create();
     $member = User::factory()->create();
-    $organization->users()->attach($member, ['role' => OrganizationRole::Member]);
+    $organization->users()->attach($member, ['role' => OrganizationRole::User]);
     $member->switchOrganization($organization);
 
     $otherOrganization = Organization::factory()->create();
@@ -76,7 +76,7 @@ it('lets an owner edit the captured contact info', function () {
 it('does not let a plain member edit contact info', function () {
     $organization = Organization::factory()->create();
     $member = User::factory()->create();
-    $organization->users()->attach($member, ['role' => OrganizationRole::Member]);
+    $organization->users()->attach($member, ['role' => OrganizationRole::User]);
     $tenantPerson = TenantPeople::factory()->create(['organization_id' => $organization->id, 'first_name' => 'Old']);
 
     Volt::actingAs($member)

@@ -1,6 +1,6 @@
 <?php
 
-use App\Actions\Organization\RemoveOrganizationMember;
+use App\Actions\Organization\RemoveOrganizationUser;
 use App\Enums\OrganizationRole;
 use App\Models\Organization;
 use App\Models\User;
@@ -11,9 +11,9 @@ it('lets an owner remove a plain member', function () {
     $owner = User::factory()->create();
     $organization->users()->attach($owner, ['role' => OrganizationRole::Owner]);
     $member = User::factory()->create();
-    $organization->users()->attach($member, ['role' => OrganizationRole::Member]);
+    $organization->users()->attach($member, ['role' => OrganizationRole::User]);
 
-    (new RemoveOrganizationMember)($owner, $organization, $member);
+    (new RemoveOrganizationUser)($owner, $organization, $member);
 
     expect($organization->fresh()->users()->whereKey($member->id)->exists())->toBeFalse();
 });
@@ -25,12 +25,12 @@ it('lets an admin remove a plain member but not an owner', function () {
     $owner = User::factory()->create();
     $organization->users()->attach($owner, ['role' => OrganizationRole::Owner]);
     $member = User::factory()->create();
-    $organization->users()->attach($member, ['role' => OrganizationRole::Member]);
+    $organization->users()->attach($member, ['role' => OrganizationRole::User]);
 
-    (new RemoveOrganizationMember)($admin, $organization, $member);
+    (new RemoveOrganizationUser)($admin, $organization, $member);
     expect($organization->fresh()->users()->whereKey($member->id)->exists())->toBeFalse();
 
-    expect(fn () => (new RemoveOrganizationMember)($admin, $organization, $owner))
+    expect(fn () => (new RemoveOrganizationUser)($admin, $organization, $owner))
         ->toThrow(AuthorizationException::class);
 });
 
@@ -41,7 +41,7 @@ it('never allows removing the last remaining owner', function () {
     $admin = User::factory()->create();
     $organization->users()->attach($admin, ['role' => OrganizationRole::Admin]);
 
-    expect(fn () => (new RemoveOrganizationMember)($owner, $organization, $owner))
+    expect(fn () => (new RemoveOrganizationUser)($owner, $organization, $owner))
         ->toThrow(AuthorizationException::class);
 
     expect($organization->fresh()->users()->whereKey($owner->id)->exists())->toBeTrue();
@@ -54,7 +54,7 @@ it('allows removing an owner when another owner remains', function () {
     $secondOwner = User::factory()->create();
     $organization->users()->attach($secondOwner, ['role' => OrganizationRole::Owner]);
 
-    (new RemoveOrganizationMember)($owner, $organization, $secondOwner);
+    (new RemoveOrganizationUser)($owner, $organization, $secondOwner);
 
     expect($organization->fresh()->users()->whereKey($secondOwner->id)->exists())->toBeFalse();
 });
@@ -64,9 +64,9 @@ it('lets a member voluntarily leave the organization', function () {
     $owner = User::factory()->create();
     $organization->users()->attach($owner, ['role' => OrganizationRole::Owner]);
     $member = User::factory()->create();
-    $organization->users()->attach($member, ['role' => OrganizationRole::Member]);
+    $organization->users()->attach($member, ['role' => OrganizationRole::User]);
 
-    (new RemoveOrganizationMember)($member, $organization, $member);
+    (new RemoveOrganizationUser)($member, $organization, $member);
 
     expect($organization->fresh()->users()->whereKey($member->id)->exists())->toBeFalse();
 });
@@ -79,10 +79,10 @@ it('reassigns the current organization to another membership when removed from t
     $member = User::factory()->create();
     // The member's default factory organization remains a fallback membership.
     $fallbackOrganization = $member->currentOrganization;
-    $organization->users()->attach($member, ['role' => OrganizationRole::Member]);
+    $organization->users()->attach($member, ['role' => OrganizationRole::User]);
     $member->switchOrganization($organization);
 
-    (new RemoveOrganizationMember)($owner, $organization, $member);
+    (new RemoveOrganizationUser)($owner, $organization, $member);
 
     $member->refresh();
     expect($member->current_organization_id)->toBe($fallbackOrganization->id);
@@ -95,10 +95,10 @@ it('clears the current organization when the user has no memberships left', func
 
     $member = User::factory()->create();
     $member->organizations()->detach();
-    $organization->users()->attach($member, ['role' => OrganizationRole::Member]);
+    $organization->users()->attach($member, ['role' => OrganizationRole::User]);
     $member->switchOrganization($organization);
 
-    (new RemoveOrganizationMember)($owner, $organization, $member);
+    (new RemoveOrganizationUser)($owner, $organization, $member);
 
     $member->refresh();
     expect($member->current_organization_id)->toBeNull();

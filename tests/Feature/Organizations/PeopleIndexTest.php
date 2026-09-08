@@ -9,7 +9,7 @@ use Livewire\Volt\Volt;
 it('lets any member view the people list', function () {
     $organization = Organization::factory()->create();
     $member = User::factory()->create();
-    $organization->users()->attach($member, ['role' => OrganizationRole::Member]);
+    $organization->users()->attach($member, ['role' => OrganizationRole::User]);
     TenantPeople::factory()->create([
         'organization_id' => $organization->id,
         'first_name' => 'Ada',
@@ -34,7 +34,7 @@ it('does not let a non-member load the people list', function () {
 it('only lists people belonging to this tenant', function () {
     $organization = Organization::factory()->create();
     $member = User::factory()->create();
-    $organization->users()->attach($member, ['role' => OrganizationRole::Member]);
+    $organization->users()->attach($member, ['role' => OrganizationRole::User]);
     TenantPeople::factory()->create(['organization_id' => $organization->id, 'first_name' => 'Home Tenant']);
 
     $otherOrganization = Organization::factory()->create();
@@ -49,7 +49,7 @@ it('only lists people belonging to this tenant', function () {
 it('filters the list by search', function () {
     $organization = Organization::factory()->create();
     $member = User::factory()->create();
-    $organization->users()->attach($member, ['role' => OrganizationRole::Member]);
+    $organization->users()->attach($member, ['role' => OrganizationRole::User]);
     TenantPeople::factory()->create(['organization_id' => $organization->id, 'first_name' => 'Ada', 'last_name' => 'Lovelace']);
     TenantPeople::factory()->create(['organization_id' => $organization->id, 'first_name' => 'Grace', 'last_name' => 'Hopper']);
 

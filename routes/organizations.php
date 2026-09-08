@@ -7,9 +7,9 @@ Route::middleware('auth')->group(function () {
     Volt::route('organizations/create', 'pages.organizations.create')
         ->name('organizations.create');
 
-    Volt::route('organizations/{organization}/members', 'pages.organizations.members')
+    Volt::route('organizations/{organization}/users', 'pages.organizations.users')
         ->middleware(['verified', 'org.context'])
-        ->name('organizations.members');
+        ->name('organizations.users');
 
     Volt::route('organizations/{organization}/products', 'pages.organizations.products')
         ->middleware(['verified', 'org.context'])

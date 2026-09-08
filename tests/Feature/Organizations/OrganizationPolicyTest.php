@@ -10,7 +10,7 @@ it('allows any member to view their organization', function (OrganizationRole $r
     $organization->users()->attach($user, ['role' => $role]);
 
     expect($user->can('view', $organization))->toBeTrue();
-})->with([OrganizationRole::Owner, OrganizationRole::Admin, OrganizationRole::Member]);
+})->with([OrganizationRole::Owner, OrganizationRole::Admin, OrganizationRole::User]);
 
 it('denies non-members from viewing or updating an organization', function () {
     $organization = Organization::factory()->create();
@@ -30,7 +30,7 @@ it('allows owners and admins to update the organization but not plain members', 
     $organization->users()->attach($admin, ['role' => OrganizationRole::Admin]);
 
     $member = User::factory()->create();
-    $organization->users()->attach($member, ['role' => OrganizationRole::Member]);
+    $organization->users()->attach($member, ['role' => OrganizationRole::User]);
 
     expect($owner->can('update', $organization))->toBeTrue()
         ->and($admin->can('update', $organization))->toBeTrue()

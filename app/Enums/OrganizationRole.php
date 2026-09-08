@@ -6,5 +6,5 @@ enum OrganizationRole: string
 {
     case Owner = 'owner';
     case Admin = 'admin';
-    case Member = 'member';
+    case User = 'user';
 }

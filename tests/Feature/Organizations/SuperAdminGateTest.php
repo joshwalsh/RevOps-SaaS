@@ -7,7 +7,7 @@ use App\Models\User;
 it('grants a super-admin org member every organization ability, even on organizations they do not belong to', function () {
     $superAdminOrg = Organization::factory()->superAdmin()->create();
     $user = User::factory()->create();
-    $superAdminOrg->users()->attach($user, ['role' => OrganizationRole::Member]);
+    $superAdminOrg->users()->attach($user, ['role' => OrganizationRole::User]);
 
     $otherOrg = Organization::factory()->create();
 
@@ -19,7 +19,7 @@ it('grants a super-admin org member every organization ability, even on organiza
 it('does not grant a regular organization member any special powers', function () {
     $organization = Organization::factory()->create();
     $user = User::factory()->create();
-    $organization->users()->attach($user, ['role' => OrganizationRole::Member]);
+    $organization->users()->attach($user, ['role' => OrganizationRole::User]);
 
     $otherOrg = Organization::factory()->create();
 
@@ -30,7 +30,7 @@ it('does not grant a regular organization member any special powers', function (
 it('grants super-admin powers regardless of which organization is currently active', function () {
     $superAdminOrg = Organization::factory()->superAdmin()->create();
     $user = User::factory()->create();
-    $superAdminOrg->users()->attach($user, ['role' => OrganizationRole::Member]);
+    $superAdminOrg->users()->attach($user, ['role' => OrganizationRole::User]);
 
     // The user's default factory organization (not the super-admin org) is current.
     expect($user->currentOrganization->is_super_admin)->toBeFalse();
@@ -43,7 +43,7 @@ it('grants super-admin powers regardless of which organization is currently acti
 it('super-admin org membership is granted regardless of role within that organization', function () {
     $superAdminOrg = Organization::factory()->superAdmin()->create();
     $member = User::factory()->create();
-    $superAdminOrg->users()->attach($member, ['role' => OrganizationRole::Member]);
+    $superAdminOrg->users()->attach($member, ['role' => OrganizationRole::User]);
 
     expect($member->isSuperAdmin())->toBeTrue();
 });

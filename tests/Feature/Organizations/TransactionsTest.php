@@ -12,7 +12,7 @@ use Livewire\Volt\Volt;
 it('lets any member view the transactions list', function () {
     $organization = Organization::factory()->create();
     $member = User::factory()->create();
-    $organization->users()->attach($member, ['role' => OrganizationRole::Member]);
+    $organization->users()->attach($member, ['role' => OrganizationRole::User]);
     Transaction::factory()->create(['organization_id' => $organization->id, 'product_name' => 'Pro Plan']);
 
     Volt::actingAs($member)
@@ -98,7 +98,7 @@ it('lets an owner record a signup for a brand new contact with no matching produ
 it('does not let a plain member record a transaction', function () {
     $organization = Organization::factory()->create();
     $member = User::factory()->create();
-    $organization->users()->attach($member, ['role' => OrganizationRole::Member]);
+    $organization->users()->attach($member, ['role' => OrganizationRole::User]);
 
     Volt::actingAs($member)
         ->test('pages.organizations.transactions', ['organization' => $organization])

@@ -7,7 +7,7 @@ use App\Models\User;
 it('allows a super admin to view the organizations index', function () {
     $superAdminOrg = Organization::factory()->superAdmin()->create();
     $user = User::factory()->create();
-    $superAdminOrg->users()->attach($user, ['role' => OrganizationRole::Member]);
+    $superAdminOrg->users()->attach($user, ['role' => OrganizationRole::User]);
 
     $otherOrg = Organization::factory()->create(['name' => 'Acme Inc']);
 

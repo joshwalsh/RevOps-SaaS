@@ -9,7 +9,7 @@ use Illuminate\Console\Attributes\Description;
 use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
 
-#[Signature('organizations:promote-super-admin {email} {--role=owner : The role to grant within the super-admin organization (owner, admin, member)}')]
+#[Signature('organizations:promote-super-admin {email} {--role=owner : The role to grant within the super-admin organization (owner, admin, user)}')]
 #[Description('Grant a user super-admin powers by attaching them to the platform super-admin organization')]
 class PromoteSuperAdmin extends Command
 {
@@ -29,7 +29,7 @@ class PromoteSuperAdmin extends Command
         $role = OrganizationRole::tryFrom($this->option('role'));
 
         if ($role === null) {
-            $this->error("Invalid role [{$this->option('role')}]. Expected one of: owner, admin, member.");
+            $this->error("Invalid role [{$this->option('role')}]. Expected one of: owner, admin, user.");
 
             return self::FAILURE;
         }

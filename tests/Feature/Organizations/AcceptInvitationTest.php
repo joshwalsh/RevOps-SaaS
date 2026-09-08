@@ -13,7 +13,7 @@ it('lets a brand new email register and join the organization in one step', func
     $invitation = OrganizationInvitation::factory()->create([
         'organization_id' => $organization->id,
         'email' => 'new-person@example.com',
-        'role' => OrganizationRole::Member,
+        'role' => OrganizationRole::User,
     ]);
 
     Volt::test('pages.organizations.accept-invitation', ['invitation' => $invitation])
@@ -25,7 +25,7 @@ it('lets a brand new email register and join the organization in one step', func
 
     $user = User::where('email', 'new-person@example.com')->firstOrFail();
 
-    expect($user->hasRole($organization, OrganizationRole::Member))->toBeTrue()
+    expect($user->hasRole($organization, OrganizationRole::User))->toBeTrue()
         ->and($user->current_organization_id)->toBe($organization->id)
         ->and(OrganizationInvitation::find($invitation->id))->toBeNull();
 
@@ -59,7 +59,7 @@ it('lets an existing but unauthenticated invited user log in and accept', functi
     $invitation = OrganizationInvitation::factory()->create([
         'organization_id' => $organization->id,
         'email' => 'existing@example.com',
-        'role' => OrganizationRole::Member,
+        'role' => OrganizationRole::User,
     ]);
 
     Volt::test('pages.organizations.accept-invitation', ['invitation' => $invitation])
@@ -69,7 +69,7 @@ it('lets an existing but unauthenticated invited user log in and accept', functi
 
     $this->assertAuthenticatedAs($user);
 
-    expect($user->hasRole($organization, OrganizationRole::Member))->toBeTrue()
+    expect($user->hasRole($organization, OrganizationRole::User))->toBeTrue()
         ->and(OrganizationInvitation::find($invitation->id))->toBeNull();
 });
 
@@ -88,7 +88,7 @@ it('rejects acceptance when authenticated as a different account than the invite
         ->call('accept')
         ->assertForbidden();
 
-    expect($wrongUser->hasRole($organization, OrganizationRole::Member))->toBeFalse()
+    expect($wrongUser->hasRole($organization, OrganizationRole::User))->toBeFalse()
         ->and(OrganizationInvitation::find($invitation->id))->not->toBeNull();
 });
 
@@ -108,7 +108,7 @@ it('rejects an invalid or expired signed invitation link', function () {
 it('is idempotent when the invited user is already a member', function () {
     $organization = Organization::factory()->create();
     $user = User::factory()->create(['email' => 'already@example.com']);
-    $organization->users()->attach($user, ['role' => OrganizationRole::Member]);
+    $organization->users()->attach($user, ['role' => OrganizationRole::User]);
 
     $invitation = OrganizationInvitation::factory()->create([
         'organization_id' => $organization->id,
