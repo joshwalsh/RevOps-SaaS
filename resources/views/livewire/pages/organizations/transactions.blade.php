@@ -182,7 +182,11 @@ new #[Layout('layouts.app')] class extends Component
     <div class="max-w-2xl mt-6 divide-y divide-gray-200 border-t border-gray-200">
         @forelse ($transactions as $transaction)
             @php $contact = $transaction->tenantContact(); @endphp
-            <div class="flex items-center justify-between py-4">
+            <a
+                href="{{ route('organizations.transactions.show', [$organization, $transaction]) }}"
+                wire:navigate
+                class="flex items-center justify-between py-4 hover:bg-gray-50"
+            >
                 <div>
                     <div class="text-sm font-medium text-gray-900">
                         {{ $contact?->full_name ?? $contact?->email ?? __('Unknown visitor') }}
@@ -206,7 +210,7 @@ new #[Layout('layouts.app')] class extends Component
                     @endif
                     <span class="text-sm font-medium text-gray-900">{{ $transaction->amountLabel() }}</span>
                 </div>
-            </div>
+            </a>
         @empty
             <p class="py-4 text-sm text-gray-500">{{ __('No transactions yet.') }}</p>
         @endforelse

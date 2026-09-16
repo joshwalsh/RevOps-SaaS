@@ -15,6 +15,10 @@ Route::middleware('auth')->group(function () {
         ->middleware(['verified', 'org.context'])
         ->name('organizations.products');
 
+    Volt::route('organizations/{organization}/products/unmatched', 'pages.organizations.products.unmatched')
+        ->middleware(['verified', 'org.context'])
+        ->name('organizations.products.unmatched');
+
     Volt::route('organizations/{organization}/transactions', 'pages.organizations.transactions')
         ->middleware(['verified', 'org.context'])
         ->name('organizations.transactions');
@@ -22,6 +26,10 @@ Route::middleware('auth')->group(function () {
     Volt::route('organizations/{organization}/transactions/import', 'pages.organizations.transactions.import')
         ->middleware(['verified', 'org.context'])
         ->name('organizations.transactions.import');
+
+    Volt::route('organizations/{organization}/transactions/{transactionId}', 'pages.organizations.transactions.show')
+        ->middleware(['verified', 'org.context'])
+        ->name('organizations.transactions.show');
 
     Volt::route('organizations/{organization}/events', 'pages.organizations.events')
         ->middleware(['verified', 'org.context'])

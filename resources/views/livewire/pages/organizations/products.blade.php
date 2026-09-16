@@ -132,14 +132,26 @@ new #[Layout('layouts.app')] class extends Component
 }; ?>
 
 <div>
-    <div class="max-w-2xl">
-        <h2 class="text-lg font-medium text-gray-900">
-            {{ __('Products') }}
-        </h2>
+    <div class="max-w-2xl flex items-start justify-between gap-4">
+        <div>
+            <h2 class="text-lg font-medium text-gray-900">
+                {{ __('Products') }}
+            </h2>
 
-        <p class="mt-1 text-sm text-gray-600">
-            {{ __('The catalog of products people can sign up for at :organization.', ['organization' => $organization->name]) }}
-        </p>
+            <p class="mt-1 text-sm text-gray-600">
+                {{ __('The catalog of products people can sign up for at :organization.', ['organization' => $organization->name]) }}
+            </p>
+        </div>
+
+        @can('match', [\App\Models\Transaction::class, $organization])
+            <a
+                href="{{ route('organizations.products.unmatched', $organization) }}"
+                wire:navigate
+                class="shrink-0 text-sm font-medium text-blue-700 hover:text-blue-800"
+            >
+                {{ __('Match Unmatched Products') }}
+            </a>
+        @endcan
     </div>
 
     <div class="max-w-2xl mt-6 divide-y divide-gray-200 border-t border-gray-200">

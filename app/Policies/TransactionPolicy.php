@@ -31,4 +31,13 @@ class TransactionPolicy
     {
         return $user->isManagerOf($organization);
     }
+
+    /**
+     * Determine whether the user can match unmatched transactions' recorded
+     * product names to a catalog product.
+     */
+    public function match(User $user, Organization $organization): bool
+    {
+        return $user->isManagerOf($organization);
+    }
 }
