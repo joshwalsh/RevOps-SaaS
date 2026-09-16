@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Models\Concerns\BelongsToOrganization;
 use Database\Factories\TenantPeopleFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -43,13 +44,31 @@ class TenantPeople extends Model
     }
 
     /**
-     * The person's full name from the contact info captured by this tenant,
-     * or null if none has been captured yet.
+     * The person's full name, combined from first_name/last_name on read.
+     * Setting it (e.g. `$tenantPerson->full_name = 'Ada Lovelace'`) splits a
+     * single name string on its first space into first_name/last_name,
+     * which is convenient for CSV imports that only have one name column.
+     * A name with no space becomes the first name alone.
      */
-    public function fullName(): ?string
+    protected function fullName(): Attribute
     {
-        $name = trim(($this->first_name ?? '').' '.($this->last_name ?? ''));
+        return Attribute::make(
+            get: function () {
+                $name = trim(($this->first_name ?? '').' '.($this->last_name ?? ''));
 
-        return $name === '' ? null : $name;
+                return $name === '' ? null : $name;
+            },
+            set: function (?string $value) {
+                $value = trim((string) $value);
+
+                if ($value === '') {
+                    return ['first_name' => null, 'last_name' => null];
+                }
+
+                [$firstName, $lastName] = array_pad(explode(' ', $value, 2), 2, null);
+
+                return ['first_name' => $firstName, 'last_name' => $lastName];
+            },
+        );
     }
 }

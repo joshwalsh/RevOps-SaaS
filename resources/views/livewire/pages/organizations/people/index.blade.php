@@ -81,7 +81,7 @@ new #[Layout('layouts.app')] class extends Component
             >
                 <div>
                     <div class="text-sm font-medium text-gray-900">
-                        {{ $tenantPerson->fullName() ?? $tenantPerson->email ?? __('Unnamed visitor') }}
+                        {{ $tenantPerson->full_name ?? $tenantPerson->email ?? __('Unnamed visitor') }}
                     </div>
                     <div class="text-sm text-gray-500">
                         {{ $tenantPerson->email ?? __('No email captured') }}

@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\TransactionStatus;
 use App\Models\Organization;
 use App\Models\Transaction;
 use App\Services\IdentityResolver;
@@ -152,14 +153,26 @@ new #[Layout('layouts.app')] class extends Component
 }; ?>
 
 <div>
-    <div class="max-w-2xl">
-        <h2 class="text-lg font-medium text-gray-900">
-            {{ __('Transactions') }}
-        </h2>
+    <div class="max-w-2xl flex items-start justify-between gap-4">
+        <div>
+            <h2 class="text-lg font-medium text-gray-900">
+                {{ __('Transactions') }}
+            </h2>
 
-        <p class="mt-1 text-sm text-gray-600">
-            {{ __('Signups recorded for :organization.', ['organization' => $organization->name]) }}
-        </p>
+            <p class="mt-1 text-sm text-gray-600">
+                {{ __('Signups recorded for :organization.', ['organization' => $organization->name]) }}
+            </p>
+        </div>
+
+        @can('create', [\App\Models\Transaction::class, $organization])
+            <a
+                href="{{ route('organizations.transactions.import', $organization) }}"
+                wire:navigate
+                class="shrink-0 text-sm font-medium text-blue-700 hover:text-blue-800"
+            >
+                {{ __('Import CSV') }}
+            </a>
+        @endcan
     </div>
 
     <div class="mt-6 max-w-2xl">
@@ -172,7 +185,7 @@ new #[Layout('layouts.app')] class extends Component
             <div class="flex items-center justify-between py-4">
                 <div>
                     <div class="text-sm font-medium text-gray-900">
-                        {{ $contact?->fullName() ?? $contact?->email ?? __('Unknown visitor') }}
+                        {{ $contact?->full_name ?? $contact?->email ?? __('Unknown visitor') }}
                     </div>
                     <div class="text-sm text-gray-500">
                         {{ $transaction->product_name }}
@@ -181,7 +194,18 @@ new #[Layout('layouts.app')] class extends Component
                     </div>
                 </div>
 
-                <span class="text-sm font-medium text-gray-900">{{ $transaction->amountLabel() }}</span>
+                <div class="flex items-center gap-3">
+                    @if ($transaction->status === TransactionStatus::Fail)
+                        <span class="inline-flex items-center rounded-full bg-red-50 px-2 py-1 text-xs font-medium text-red-700">
+                            {{ __('Failed') }}
+                        </span>
+                    @elseif ($transaction->status === TransactionStatus::Refund)
+                        <span class="inline-flex items-center rounded-full bg-amber-50 px-2 py-1 text-xs font-medium text-amber-700">
+                            {{ __('Refunded') }}
+                        </span>
+                    @endif
+                    <span class="text-sm font-medium text-gray-900">{{ $transaction->amountLabel() }}</span>
+                </div>
             </div>
         @empty
             <p class="py-4 text-sm text-gray-500">{{ __('No transactions yet.') }}</p>
@@ -218,7 +242,7 @@ new #[Layout('layouts.app')] class extends Component
                             <option value="">{{ __('Select a person...') }}</option>
                             @foreach ($tenantPeople as $tenantPerson)
                                 <option value="{{ $tenantPerson->person_id }}">
-                                    {{ $tenantPerson->fullName() ?? $tenantPerson->email ?? __('Visitor since :date', ['date' => $tenantPerson->first_seen_at->format('M j, Y')]) }}
+                                    {{ $tenantPerson->full_name ?? $tenantPerson->email ?? __('Visitor since :date', ['date' => $tenantPerson->first_seen_at->format('M j, Y')]) }}
                                 </option>
                             @endforeach
                         </select>

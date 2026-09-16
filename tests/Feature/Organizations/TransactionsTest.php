@@ -91,7 +91,7 @@ it('lets an owner record a signup for a brand new contact with no matching produ
     expect($person->email_hash)->toBe(hash('sha256', 'grace@example.com'));
 
     $tenantPerson = TenantPeople::where('organization_id', $organization->id)->where('person_id', $person->id)->firstOrFail();
-    expect($tenantPerson->fullName())->toBe('Grace Hopper')
+    expect($tenantPerson->full_name)->toBe('Grace Hopper')
         ->and($tenantPerson->email)->toBe('grace@example.com');
 });
 

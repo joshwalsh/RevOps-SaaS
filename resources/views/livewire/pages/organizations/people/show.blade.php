@@ -96,7 +96,7 @@ new #[Layout('layouts.app')] class extends Component
         </a>
 
         <h2 class="mt-2 text-lg font-medium text-gray-900">
-            {{ $tenantPerson->fullName() ?? $tenantPerson->email ?? __('Unnamed visitor') }}
+            {{ $tenantPerson->full_name ?? $tenantPerson->email ?? __('Unnamed visitor') }}
         </h2>
 
         <p class="mt-1 text-sm text-gray-600">
@@ -132,7 +132,7 @@ new #[Layout('layouts.app')] class extends Component
             </form>
         @else
             <div class="mt-6 text-sm text-gray-700">
-                <div>{{ __('Name') }}: {{ $tenantPerson->fullName() ?? __('Unknown') }}</div>
+                <div>{{ __('Name') }}: {{ $tenantPerson->full_name ?? __('Unknown') }}</div>
                 <div>{{ __('Email') }}: {{ $tenantPerson->email ?? __('Unknown') }}</div>
             </div>
         @endcan

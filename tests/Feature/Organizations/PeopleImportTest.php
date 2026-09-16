@@ -91,7 +91,29 @@ it('imports mapped rows into the organization', function () {
 
     expect($people)->toHaveCount(2);
     expect($people->pluck('email')->sort()->values()->all())->toBe(['ada@example.com', 'grace@example.com']);
-    expect($people->firstWhere('email', 'ada@example.com')->fullName())->toBe('Ada Lovelace');
+    expect($people->firstWhere('email', 'ada@example.com')->full_name)->toBe('Ada Lovelace');
+});
+
+it('splits a mapped full name column into first and last name', function () {
+    $organization = Organization::factory()->create();
+    $owner = User::factory()->create();
+    $organization->users()->attach($owner, ['role' => OrganizationRole::Owner]);
+
+    $csv = fakeCsv('people.csv', "Name,Email\nAda Lovelace,ada@example.com\n");
+
+    Volt::actingAs($owner)
+        ->test('pages.organizations.people.import', ['organization' => $organization])
+        ->set('csvFile', $csv)
+        ->set('emailColumnIndex', '1')
+        ->set('fullNameColumnIndex', '0')
+        ->call('import')
+        ->assertHasNoErrors()
+        ->assertSet('importedCount', 1);
+
+    $person = TenantPeople::where('organization_id', $organization->id)->first();
+
+    expect($person->first_name)->toBe('Ada');
+    expect($person->last_name)->toBe('Lovelace');
 });
 
 it('skips rows with a missing or invalid email and reports them', function () {

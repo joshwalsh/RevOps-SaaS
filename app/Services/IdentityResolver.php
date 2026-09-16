@@ -50,12 +50,17 @@ class IdentityResolver
      * without an email there's nothing to match against, so a new person is
      * always created. Existing contact fields are left alone when the new
      * value given is blank, so a partial edit doesn't clobber known info.
+     *
+     * $fullName is a convenience for sources (e.g. CSV imports) that only
+     * have a single name column: it's split into first/last via
+     * TenantPeople's full_name setter. Explicit $firstName/$lastName take
+     * precedence when both are given.
      */
-    public function resolveContact(string $organizationId, ?string $email, ?string $firstName, ?string $lastName): Person
+    public function resolveContact(string $organizationId, ?string $email, ?string $firstName, ?string $lastName, ?string $fullName = null): Person
     {
         $emailHash = $email !== null ? hash('sha256', mb_strtolower(trim($email))) : null;
 
-        return DB::transaction(function () use ($organizationId, $emailHash, $email, $firstName, $lastName) {
+        return DB::transaction(function () use ($organizationId, $emailHash, $email, $firstName, $lastName, $fullName) {
             $person = $emailHash !== null
                 ? Person::query()->firstOrCreate(['email_hash' => $emailHash])
                 : Person::query()->create();
@@ -64,6 +69,10 @@ class IdentityResolver
                 ['organization_id' => $organizationId, 'person_id' => $person->id],
                 ['first_seen_at' => now()],
             );
+
+            if (filled($fullName)) {
+                $tenantPerson->full_name = $fullName;
+            }
 
             $tenantPerson->fill(array_filter([
                 'first_name' => $firstName,

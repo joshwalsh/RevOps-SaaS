@@ -103,6 +103,85 @@ it('keeps the transaction and its recorded product name when the linked product 
         ->product_name->toBe('Deleted Plan');
 });
 
+it('computes amount as total minus fees when amount is not supplied but a total is', function () {
+    $organization = Organization::factory()->create();
+
+    $transaction = Transaction::factory()->create([
+        'organization_id' => $organization->id,
+        'amount_cents' => null,
+        'total_cents' => 10000,
+        'fees_cents' => 300,
+    ]);
+
+    expect($transaction->fresh()->amount_cents)->toBe(9700);
+});
+
+it('computes total from subtotal plus tax when no total is supplied, then subtracts fees for the amount', function () {
+    $organization = Organization::factory()->create();
+
+    $transaction = Transaction::factory()->create([
+        'organization_id' => $organization->id,
+        'amount_cents' => null,
+        'subtotal_cents' => 10000,
+        'tax_cents' => 800,
+        'fees_cents' => 300,
+    ]);
+
+    expect($transaction->fresh()->amount_cents)->toBe(10500);
+});
+
+it('ignores discount when computing amount, since it is already reflected in subtotal', function () {
+    $organization = Organization::factory()->create();
+
+    $transaction = Transaction::factory()->create([
+        'organization_id' => $organization->id,
+        'amount_cents' => null,
+        'subtotal_cents' => 10000,
+        'discount_cents' => 1000,
+        'tax_cents' => 800,
+        'fees_cents' => 300,
+    ]);
+
+    expect($transaction->fresh()->amount_cents)->toBe(10500);
+});
+
+it('absolute-values the computed amount when fees exceed the total, so it never overflows the unsigned column', function () {
+    $organization = Organization::factory()->create();
+
+    $transaction = Transaction::factory()->create([
+        'organization_id' => $organization->id,
+        'amount_cents' => null,
+        'total_cents' => 500,
+        'fees_cents' => 800,
+    ]);
+
+    expect($transaction->fresh()->amount_cents)->toBe(300);
+});
+
+it('computes a free amount when no accounting fields are supplied at all', function () {
+    $organization = Organization::factory()->create();
+
+    $transaction = Transaction::factory()->create([
+        'organization_id' => $organization->id,
+        'amount_cents' => null,
+    ]);
+
+    expect($transaction->fresh())->amount_cents->toBe(0)->isFree()->toBeTrue();
+});
+
+it('does not override an explicitly supplied amount with the breakdown calculation', function () {
+    $organization = Organization::factory()->create();
+
+    $transaction = Transaction::factory()->create([
+        'organization_id' => $organization->id,
+        'amount_cents' => 2900,
+        'subtotal_cents' => 10000,
+        'fees_cents' => 300,
+    ]);
+
+    expect($transaction->fresh()->amount_cents)->toBe(2900);
+});
+
 it('scopes transactions and products to a single tenant', function () {
     $organizationA = Organization::factory()->create();
     $organizationB = Organization::factory()->create();

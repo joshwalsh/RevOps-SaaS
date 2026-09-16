@@ -26,6 +26,8 @@ new #[Layout('layouts.app')] class extends Component
 
     public string $emailColumnIndex = '';
 
+    public string $fullNameColumnIndex = '';
+
     public string $firstNameColumnIndex = '';
 
     public string $lastNameColumnIndex = '';
@@ -70,6 +72,7 @@ new #[Layout('layouts.app')] class extends Component
 
         $this->headers = $header;
         $this->emailColumnIndex = '';
+        $this->fullNameColumnIndex = '';
         $this->firstNameColumnIndex = '';
         $this->lastNameColumnIndex = '';
         $this->imported = false;
@@ -86,7 +89,7 @@ new #[Layout('layouts.app')] class extends Component
 
         $this->reset(
             'csvFile', 'storedPath', 'headers',
-            'emailColumnIndex', 'firstNameColumnIndex', 'lastNameColumnIndex',
+            'emailColumnIndex', 'fullNameColumnIndex', 'firstNameColumnIndex', 'lastNameColumnIndex',
             'imported', 'importedCount', 'skippedCount', 'rowErrors',
         );
     }
@@ -104,6 +107,7 @@ new #[Layout('layouts.app')] class extends Component
         ], [], ['emailColumnIndex' => __('email column')]);
 
         $emailIndex = (int) $this->emailColumnIndex;
+        $fullNameIndex = $this->fullNameColumnIndex === '' ? null : (int) $this->fullNameColumnIndex;
         $firstNameIndex = $this->firstNameColumnIndex === '' ? null : (int) $this->firstNameColumnIndex;
         $lastNameIndex = $this->lastNameColumnIndex === '' ? null : (int) $this->lastNameColumnIndex;
 
@@ -135,6 +139,7 @@ new #[Layout('layouts.app')] class extends Component
                 continue;
             }
 
+            $fullName = $fullNameIndex !== null ? trim((string) ($row[$fullNameIndex] ?? '')) : null;
             $firstName = $firstNameIndex !== null ? trim((string) ($row[$firstNameIndex] ?? '')) : null;
             $lastName = $lastNameIndex !== null ? trim((string) ($row[$lastNameIndex] ?? '')) : null;
 
@@ -143,6 +148,7 @@ new #[Layout('layouts.app')] class extends Component
                 $email,
                 $firstName !== '' ? $firstName : null,
                 $lastName !== '' ? $lastName : null,
+                $fullName !== '' ? $fullName : null,
             );
 
             $imported++;
@@ -156,7 +162,7 @@ new #[Layout('layouts.app')] class extends Component
         $this->rowErrors = $errors;
         $this->imported = true;
 
-        $this->reset('csvFile', 'storedPath', 'headers', 'emailColumnIndex', 'firstNameColumnIndex', 'lastNameColumnIndex');
+        $this->reset('csvFile', 'storedPath', 'headers', 'emailColumnIndex', 'fullNameColumnIndex', 'firstNameColumnIndex', 'lastNameColumnIndex');
     }
 }; ?>
 
@@ -229,24 +235,49 @@ new #[Layout('layouts.app')] class extends Component
                     <x-input-error :messages="$errors->get('emailColumnIndex')" class="mt-2" />
                 </div>
 
-                <div>
-                    <x-input-label for="firstNameColumnIndex" :value="__('First name')" />
-                    <select wire:model="firstNameColumnIndex" id="firstNameColumnIndex" class="block mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 leading-6 focus:border-blue-500 focus:outline-none focus:ring-3 focus:ring-blue-500/50">
-                        <option value="">{{ __('— None —') }}</option>
-                        @foreach ($headers as $index => $header)
-                            <option value="{{ $index }}">{{ $header !== '' ? $header : __('Column :n', ['n' => $index + 1]) }}</option>
-                        @endforeach
-                    </select>
-                </div>
+                <div class="rounded-lg border border-gray-200 overflow-hidden">
+                    <div class="bg-gray-50 px-4 py-3">
+                        <h3 class="flex items-center gap-2 text-sm font-medium text-gray-900">
+                            <svg class="hi-mini hi-user-circle inline-block size-5 text-blue-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-5.5-2.5a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0zM10 12a5.99 5.99 0 00-4.793 2.39A6.483 6.483 0 0010 16.5a6.483 6.483 0 004.793-2.11A5.99 5.99 0 0010 12z" clip-rule="evenodd" />
+                            </svg>
+                            <span>{{ __('Name') }}</span>
+                        </h3>
+                        <p class="mt-1 text-sm text-gray-500">{{ __('Map a single combined column, or separate first/last columns.') }}</p>
+                    </div>
 
-                <div>
-                    <x-input-label for="lastNameColumnIndex" :value="__('Last name')" />
-                    <select wire:model="lastNameColumnIndex" id="lastNameColumnIndex" class="block mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 leading-6 focus:border-blue-500 focus:outline-none focus:ring-3 focus:ring-blue-500/50">
-                        <option value="">{{ __('— None —') }}</option>
-                        @foreach ($headers as $index => $header)
-                            <option value="{{ $index }}">{{ $header !== '' ? $header : __('Column :n', ['n' => $index + 1]) }}</option>
-                        @endforeach
-                    </select>
+                    <div class="p-4 space-y-4">
+                        <div>
+                            <x-input-label for="fullNameColumnIndex" :value="__('Full name')" />
+                            <select wire:model="fullNameColumnIndex" id="fullNameColumnIndex" class="block mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 leading-6 focus:border-blue-500 focus:outline-none focus:ring-3 focus:ring-blue-500/50">
+                                <option value="">{{ __('— None —') }}</option>
+                                @foreach ($headers as $index => $header)
+                                    <option value="{{ $index }}">{{ $header !== '' ? $header : __('Column :n', ['n' => $index + 1]) }}</option>
+                                @endforeach
+                            </select>
+                            <p class="mt-1 text-sm text-gray-500">{{ __("Use this if the CSV has one combined name column. It's split on the first space.") }}</p>
+                        </div>
+
+                        <div>
+                            <x-input-label for="firstNameColumnIndex" :value="__('First name')" />
+                            <select wire:model="firstNameColumnIndex" id="firstNameColumnIndex" class="block mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 leading-6 focus:border-blue-500 focus:outline-none focus:ring-3 focus:ring-blue-500/50">
+                                <option value="">{{ __('— None —') }}</option>
+                                @foreach ($headers as $index => $header)
+                                    <option value="{{ $index }}">{{ $header !== '' ? $header : __('Column :n', ['n' => $index + 1]) }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div>
+                            <x-input-label for="lastNameColumnIndex" :value="__('Last name')" />
+                            <select wire:model="lastNameColumnIndex" id="lastNameColumnIndex" class="block mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 leading-6 focus:border-blue-500 focus:outline-none focus:ring-3 focus:ring-blue-500/50">
+                                <option value="">{{ __('— None —') }}</option>
+                                @foreach ($headers as $index => $header)
+                                    <option value="{{ $index }}">{{ $header !== '' ? $header : __('Column :n', ['n' => $index + 1]) }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
                 </div>
             </div>
 
